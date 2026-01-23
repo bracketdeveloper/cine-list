@@ -1,6 +1,33 @@
 <script>
+import {register} from "@/functions";
+
 export default {
   name: "RegisterComponent",
+  mounted() {
+    let user = localStorage.getItem("user-data")
+    if (user) {
+      this.$router.push({name: "HomeComponent"})
+    }
+  },
+  methods: {
+    async registerHandler() {
+     const result = await  register(this);
+     if (result.status === 201) {
+       alert("Register successfully");
+       localStorage.setItem("user-data", JSON.stringify(result.data))
+       this.$router.push("/");
+     }
+    }
+  },
+  data(){
+    return {
+      name:"",
+      email:"",
+      password:"",
+      confirmPassword:"",
+      checkBox:false,
+    }
+  }
 }
 </script>
 
@@ -26,7 +53,7 @@ export default {
         <div class="space-y-6">
           <div>
             <div class="relative flex items-center">
-              <input name="name" type="text" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter name" />
+              <input v-model="name" ref="name" type="text" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter name" />
               <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
                 <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
                 <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
@@ -35,7 +62,7 @@ export default {
           </div>
           <div>
             <div class="relative flex items-center">
-              <input name="email" type="email" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter email" />
+              <input v-model="email" ref="email" type="email" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter email" />
               <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 682.667 682.667">
                 <defs>
                   <clipPath id="a" clipPathUnits="userSpaceOnUse">
@@ -51,7 +78,7 @@ export default {
           </div>
           <div>
             <div class="relative flex items-center">
-              <input name="password" type="password" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter password" />
+              <input v-model="password" ref="password" type="password" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Enter password" />
               <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4 cursor-pointer" viewBox="0 0 128 128">
                 <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
               </svg>
@@ -59,14 +86,14 @@ export default {
           </div>
           <div>
             <div class="relative flex items-center">
-              <input name="password" type="password" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Confirm Password" />
+              <input v-model="confirmPassword" ref="confirm-password" type="password" required class="text-slate-900 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Confirm Password" />
               <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4 cursor-pointer" viewBox="0 0 128 128">
                 <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
               </svg>
             </div>
           </div>
           <div class="flex items-center">
-            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded" />
+            <input v-model="checkBox" ref="remember-me" type="checkbox" class="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded" />
             <label for="remember-me" class="ml-3 block text-sm text-slate-600">
               I accept the <router-link to="/terms-and-conditions" target="_blank"><a class="text-blue-600 font-medium hover:underline ml-1">Terms and Conditions</a></router-link>
             </label>
@@ -74,7 +101,7 @@ export default {
         </div>
 
         <div class="mt-8">
-          <button type="button" class="w-full py-2.5 px-4 tracking-wider text-sm rounded-md text-white bg-slate-800 hover:bg-slate-900 focus:outline-none cursor-pointer">
+          <button @click="this.registerHandler" type="button" class="w-full py-2.5 px-4 tracking-wider text-sm rounded-md text-white bg-slate-800 hover:bg-slate-900 focus:outline-none cursor-pointer">
             Create an account
           </button>
         </div>

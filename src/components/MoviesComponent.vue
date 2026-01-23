@@ -1,6 +1,11 @@
 <script>
+import {checkUserAuth} from "@/functions";
+
 export default {
   name: "MoviesComponent",
+  mounted() {
+    checkUserAuth(this);
+  }
 }
 </script>
 

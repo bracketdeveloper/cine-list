@@ -1,6 +1,11 @@
 <script>
+import {checkUserAuth} from "@/functions";
+
 export default {
   name: "WatchlistComponent",
+  mounted() {
+    checkUserAuth(this);
+  }
 }
 </script>
 

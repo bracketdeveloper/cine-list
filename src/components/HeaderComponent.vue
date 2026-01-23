@@ -3,15 +3,38 @@ import {menuToggleFunction} from "@/components/functions";
 
 export default {
   name: "HeaderComponent",
+  data(){
+    return {
+      isLogin: false,
+    }
+  },
   mounted() {
     menuToggleFunction();
+
+    this.isLogin = !!localStorage.getItem("user-data")
+    let isStop = true
+    if(isStop) {
+      setInterval(() => {
+        this.isLogin = !!localStorage.getItem("user-data")
+      }, 500) // checks every 0.5s
+    }
+  },
+  methods: {
+    logout(){
+      let con = confirm("Do you want to sign out?")
+      if (con) {
+        localStorage.removeItem("user-data")
+        this.isLogin = false
+        this.$router.push("/login")
+      }
+    }
   }
 }
 
 </script>
 
 <template>
-  <header class='flex border-b border-gray-300 py-3 px-4 sm:px-10 bg-white min-h-[65px] tracking-wide relative z-50'>
+  <header v-show="!userData" class='flex border-b border-gray-300 py-3 px-4 sm:px-10 bg-white min-h-[65px] tracking-wide relative z-50'>
     <div class='flex flex-wrap items-center gap-4 max-w-screen-xl mx-auto w-full'>
       <router-link to="/"><a class="max-sm:hidden"><img src="../assets/logo.png" alt="logo"
                                                         class='w-[134px]  logo-image'/>
@@ -73,7 +96,21 @@ export default {
         </div>
 
       </div>
-      <div class="flex items-center ml-auto space-x-6">
+      <div v-if="isLogin" class="flex items-center ml-auto space-x-6">
+        <button class="font-medium text-[15px] border-0 outline-0 cursor-pointer">
+          <router-link to="/login"><a @click="logout()"
+                                      class="px-6 py-2.5 rounded-lg cursor-pointer text-white text-sm tracking-wider font-medium border-0 outline-0 outline-none bg-red-700 hover:bg-red-800 active:bg-red-700">
+            Logout</a></router-link>
+        </button>
+        <button id="toggleOpen" class='lg:hidden cursor-pointer'>
+          <svg class="w-7 h-7" fill="#000" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                  clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <div v-else class="flex items-center ml-auto space-x-6">
         <button class="font-medium text-[15px] border-0 outline-0 cursor-pointer">
           <router-link to="/login"><a class="text-blue-700 hover:underline">Login</a></router-link>
         </button>
@@ -91,6 +128,7 @@ export default {
           </svg>
         </button>
       </div>
+
 
     </div>
   </header>

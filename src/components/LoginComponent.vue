@@ -1,6 +1,25 @@
 <script>
+import {login} from "@/functions";
+
 export default {
   name: "LoginComponent",
+  mounted() {
+    let user = localStorage.getItem("user-data")
+    if (user) {
+      this.$router.push({name: "HomeComponent"})
+    }
+  },
+  methods: {
+    loginHandler() {
+      login(this)
+    }
+  },
+  data() {
+    return {
+      "email": '',
+      "password": '',
+    }
+  }
 }
 </script>
 
@@ -14,13 +33,13 @@ export default {
             <form class="space-y-6">
               <div class="mb-12">
                 <h1 class="text-slate-900 text-3xl font-semibold">Sign in</h1>
-                <p class="text-slate-600 text-[15px] mt-6 leading-relaxed">Sign in to manage your cine list and save what you want to watch next.</p>
+                <p class="text-slate-600 text-[15px] mt-6 leading-relaxed">Sign in to manage your cine list and save
+                  what you want to watch next.</p>
               </div>
 
               <div>
-                <label class="text-slate-900 text-sm font-medium mb-2 block">User name</label>
                 <div class="relative flex items-center">
-                  <input name="username" type="text" required
+                  <input v-model="email" ref="email" type="text" required
                          class="w-full text-sm text-slate-900 border border-slate-300 pl-4 pr-10 py-3 rounded-lg outline-blue-600"
                          placeholder="Enter user name"/>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb"
@@ -33,9 +52,8 @@ export default {
                 </div>
               </div>
               <div>
-                <label class="text-slate-900 text-sm font-medium mb-2 block">Password</label>
                 <div class="relative flex items-center">
-                  <input name="password" type="password" required
+                  <input v-model="password" ref="password" type="password" required
                          class="w-full text-sm text-slate-900 border border-slate-300 pl-4 pr-10 py-3 rounded-lg outline-blue-600"
                          placeholder="Enter password"/>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb"
@@ -48,12 +66,14 @@ export default {
               </div>
 
               <div class="!mt-12">
-                <button type="button"
+                <button type="button" @click="loginHandler"
                         class="w-full shadow-xl py-2.5 px-4 text-[15px] font-medium tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer">
                   Sign in
                 </button>
                 <p class="text-sm !mt-6 text-center text-slate-600">Don't have an account
-                  <router-link to="/register"><a class="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap">Register here</a></router-link>
+                  <router-link to="/register"><a
+                      class="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap">Register here</a>
+                  </router-link>
                 </p>
               </div>
             </form>
