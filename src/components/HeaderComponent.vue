@@ -1,5 +1,7 @@
 <script>
-import {menuToggleFunction} from "@/components/functions";
+
+
+import {menuToggleFunction} from "@/functions";
 
 export default {
   name: "HeaderComponent",

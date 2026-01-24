@@ -1,7 +1,23 @@
 import axios from "axios";
 import bcrypt from "bcryptjs";
 
-const mockApi = process.env.VUE_APP_API_BASE_URL
+
+export function menuToggleFunction() {
+    var toggleOpen = document.getElementById('toggleOpen');
+    var toggleClose = document.getElementById('toggleClose');
+    var collapseMenu = document.getElementById('collapseMenu');
+
+    function handleClick() {
+        if (collapseMenu.style.display === 'block') {
+            collapseMenu.style.display = 'none';
+        } else {
+            collapseMenu.style.display = 'block';
+        }
+    }
+
+    toggleOpen.addEventListener('click', handleClick);
+    toggleClose.addEventListener('click', handleClick);
+}
 
 export function checkUserAuth(vm) {
     let user = localStorage.getItem("user-data");
@@ -34,7 +50,7 @@ export async function checkUserByExistingEmail(email) {
     var userExists = false
 
     try {
-        const res = await axios.get(`${mockApi}/users`, {
+        const res = await axios.get(`${process.env.VUE_APP_API_BASE_URL}/users`, {
             params: {email}
         })
 
@@ -53,7 +69,7 @@ export async function getUserByEmail(email) {
     let userExists = false;
 
     try {
-        const res = await axios.get(`${mockApi}/users`, {
+        const res = await axios.get(`${process.env.VUE_APP_API_BASE_URL}/users`, {
             params: {email}
         })
 
@@ -76,7 +92,7 @@ export async function register(vm) {
         vm.$refs.email.focus()
         return
     }
-    if(await checkUserByExistingEmail(vm.email)){
+    if (await checkUserByExistingEmail(vm.email)) {
         alert("Email already exists")
         vm.$refs.email.focus()
         return
@@ -100,15 +116,16 @@ export async function register(vm) {
 
     const hashedPassword = await hashPassword(vm.password);
 
-    return await axios.post(mockApi + "/users", {
+    return await axios.post(process.env.VUE_APP_API_BASE_URL + "/users", {
         "name": vm.name,
         "password": hashedPassword,
         "email": vm.email,
     });
 }
+
 export async function login(vm) {
     if (!checkEmpty(vm, vm.email, "Email", 'email')) return
-    if(!validateEmail(vm.email)) {
+    if (!validateEmail(vm.email)) {
         alert("Enter a valid Email")
         vm.$refs.email.focus()
         return
@@ -132,3 +149,136 @@ export async function login(vm) {
     }
 
 }
+
+export async function getPopularMovies() {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/movie/popular', {
+            params: {
+                language: 'en-US',
+                page: 1
+            },
+            headers: {
+                accept: 'application/json',
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+
+
+        if (response.status === 200) {
+            return response.data.results;
+        } else {
+            return null;
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function getUpcomingMovies() {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/movie/upcoming', {
+            params: {
+                language: 'en-US',
+                page: 1
+            },
+            headers: {
+                accept: 'application/json',
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+
+
+        if (response.status === 200) {
+            return response.data.results;
+        } else {
+            return null;
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function getTopRatedMovies() {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/movie/top_rated', {
+            params: {
+                language: 'en-US',
+                page: 1
+            },
+            headers: {
+                accept: 'application/json',
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+
+
+        if (response.status === 200) {
+            return response.data.results;
+        } else {
+            return null;
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function getNowPlayingMovies() {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/movie/now_playing', {
+            params: {
+                language: 'en-US',
+                page: 1
+            },
+            headers: {
+                accept: 'application/json',
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+
+
+        if (response.status === 200) {
+            return response.data.results;
+        } else {
+            return null;
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function getMoviesGenre() {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/genre/movie/list', {
+            params: {
+                language: 'en-US',
+                page: 1
+            },
+            headers: {
+                accept: 'application/json',
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+        if (response.status === 200) {
+            return response.data.genres;
+        } else {
+            return [];
+        }
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+}
+
+
