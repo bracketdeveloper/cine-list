@@ -19,11 +19,12 @@ export function menuToggleFunction() {
     toggleClose.addEventListener('click', handleClick);
 }
 
-export function checkUserAuth(vm) {
+export function checkUserAuth() {
     let user = localStorage.getItem("user-data");
     if (!user) {
-        vm.$router.push("/login");
+        return false;
     }
+    return true;
 }
 
 function checkEmpty(vm, val, inputName, inputRef) {
@@ -150,9 +151,9 @@ export async function login(vm) {
 
 }
 
-export async function getPopularMovies() {
+export async function getMoviesOrTvShow(link) {
     try {
-        const response = await axios.get('https://api.themoviedb.org/3/movie/popular', {
+        const response = await axios.get(link, {
             params: {
                 language: 'en-US',
                 page: 1
@@ -177,90 +178,9 @@ export async function getPopularMovies() {
     }
 }
 
-export async function getUpcomingMovies() {
+export async function getGenre(link) {
     try {
-        const response = await axios.get('https://api.themoviedb.org/3/movie/upcoming', {
-            params: {
-                language: 'en-US',
-                page: 1
-            },
-            headers: {
-                accept: 'application/json',
-                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
-            }
-        });
-
-
-        if (response.status === 200) {
-            return response.data.results;
-        } else {
-            return null;
-        }
-
-
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
-
-export async function getTopRatedMovies() {
-    try {
-        const response = await axios.get('https://api.themoviedb.org/3/movie/top_rated', {
-            params: {
-                language: 'en-US',
-                page: 1
-            },
-            headers: {
-                accept: 'application/json',
-                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
-            }
-        });
-
-
-        if (response.status === 200) {
-            return response.data.results;
-        } else {
-            return null;
-        }
-
-
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
-
-export async function getNowPlayingMovies() {
-    try {
-        const response = await axios.get('https://api.themoviedb.org/3/movie/now_playing', {
-            params: {
-                language: 'en-US',
-                page: 1
-            },
-            headers: {
-                accept: 'application/json',
-                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
-            }
-        });
-
-
-        if (response.status === 200) {
-            return response.data.results;
-        } else {
-            return null;
-        }
-
-
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
-
-export async function getMoviesGenre() {
-    try {
-        const response = await axios.get('https://api.themoviedb.org/3/genre/movie/list', {
+        const response = await axios.get(link, {
             params: {
                 language: 'en-US',
                 page: 1

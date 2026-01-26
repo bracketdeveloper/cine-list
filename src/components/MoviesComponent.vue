@@ -1,11 +1,7 @@
 <script>
 import {
-  checkUserAuth,
-  getMoviesGenre,
-  getNowPlayingMovies,
-  getPopularMovies,
-  getTopRatedMovies,
-  getUpcomingMovies
+  getMoviesOrTvShow,
+  getGenre
 } from "@/functions";
 
 export default {
@@ -16,18 +12,18 @@ export default {
       allMoviesData: [], // full list of movies from API
       genres: [],
       selectedGenre: '',
-      movieType: ''
+      movieType: "Popular Movies",
     }
   },
   async mounted() {
-    checkUserAuth(this);
-    this.moviesData = await getPopularMovies()
-    this.genres = await getMoviesGenre();
+    this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/popular');
+    this.moviesData = [...this.allMoviesData];
+    this.genres = await getGenre('https://api.themoviedb.org/3/genre/movie/list');
   },
   methods: {
     async filterPopularMovies() {
       this.selectedGenre = '';
-      this.allMoviesData = await getPopularMovies();
+      this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/popular');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Popular Movies";
     },
@@ -35,7 +31,7 @@ export default {
 
     async filterTopRatedMovies() {
       this.selectedGenre = '';
-      this.allMoviesData = await getTopRatedMovies();
+      this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/top_rated');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Top Rated Movies";
     },
@@ -43,7 +39,7 @@ export default {
 
     async filterUpcomingMovies() {
       this.selectedGenre = '';
-      this.allMoviesData = await getUpcomingMovies();
+      this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/upcoming');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Upcoming Movies";
     },
@@ -51,7 +47,7 @@ export default {
 
     async filterNowPlayingMovies() {
       this.selectedGenre = '';
-      this.allMoviesData = await getNowPlayingMovies();
+      this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/now_playing');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Now Playing Movies";
     },

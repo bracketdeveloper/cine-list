@@ -9,6 +9,7 @@ import ContactComponent from "@/components/ContactComponent.vue";
 import AboutComponent from "@/components/AboutComponent.vue";
 import TermAndConditionComponent from "@/components/TermAndConditionComponent.vue";
 import PrivacyComponent from "@/components/PrivacyComponent.vue";
+import TvShowsComponent from "@/components/TvShowsComponent.vue";
 
 const routes = [
     {
@@ -20,6 +21,11 @@ const routes = [
         path: "/movies",
         name: "MoviesComponent",
         component: MoviesComponent,
+    },
+    {
+        path: "/tv-shows",
+        name: "TVShowsComponent",
+        component: TvShowsComponent,
     },
     {
         path: "/watchlist",

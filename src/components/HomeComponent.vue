@@ -1,10 +1,8 @@
 <script>
-import {checkUserAuth} from "@/functions";
 
 export default {
   name: "HomeComponent",
   mounted() {
-    checkUserAuth(this);
   }
 }
 </script>
