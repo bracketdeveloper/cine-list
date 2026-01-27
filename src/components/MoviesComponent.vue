@@ -1,7 +1,7 @@
 <script>
 import {
   getMoviesOrTvShow,
-  getGenre
+  getGenre, getWatchListByUserId, addWatchListByUserId, removeWatchListByUserId
 } from "@/functions";
 
 export default {
@@ -13,12 +13,22 @@ export default {
       genres: [],
       selectedGenre: '',
       movieType: "Popular Movies",
+      watchList: [],
+      userId:"",
+      watchListMovies: []
     }
   },
   async mounted() {
+    if (localStorage.getItem("user-data")) {
+      this.userId = JSON.parse(localStorage.getItem('user-data'))[0].id;
+    }
     this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/popular');
     this.moviesData = [...this.allMoviesData];
     this.genres = await getGenre('https://api.themoviedb.org/3/genre/movie/list');
+    if(localStorage.getItem('user-data')){
+      this.watchList = await getWatchListByUserId(this.userId);
+      this.watchListMovies = this.watchList.movie_id || []
+    }
   },
   methods: {
     async filterPopularMovies() {
@@ -27,32 +37,24 @@ export default {
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Popular Movies";
     },
-
-
     async filterTopRatedMovies() {
       this.selectedGenre = '';
       this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/top_rated');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Top Rated Movies";
     },
-
-
     async filterUpcomingMovies() {
       this.selectedGenre = '';
       this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/upcoming');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Upcoming Movies";
     },
-
-
     async filterNowPlayingMovies() {
       this.selectedGenre = '';
       this.allMoviesData = await getMoviesOrTvShow('https://api.themoviedb.org/3/movie/now_playing');
       this.moviesData = [...this.allMoviesData];
       this.movieType = "Now Playing Movies";
     },
-
-
     filterByGenre() {
       if (!this.selectedGenre) {
 // no genre selected, show all movies
@@ -63,7 +65,40 @@ export default {
             movie.genre_ids.includes(genreId)
         );
       }
+    },
+    isInWatchList(movieId) {
+      return this.watchListMovies.includes(movieId)
+    },
+    async toggleWatchList(movieId) {
+      if (!this.userId){
+        alert("Need to login first");
+        return;
+      }
+      if (this.isInWatchList(movieId)) {
+        // Remove locally first
+        this.watchListMovies = this.watchListMovies.filter(id => id !== movieId);
+        alert('Movie removed from your watchlist!');
+
+        // Update API in background
+        removeWatchListByUserId(this.userId, movieId)
+            .catch(err => {
+              console.error(err);
+              alert('Failed to remove movie from watchlist.');
+            });
+      } else {
+        // Add locally first
+        this.watchListMovies.push(movieId);
+        alert('Movie added to your watchlist!');
+
+        // Update API in background
+        addWatchListByUserId(this.userId, movieId)
+            .catch(err => {
+              console.error(err);
+              alert('Failed to add movie to watchlist.');
+            });
+      }
     }
+
   }
 }
 </script>
@@ -116,11 +151,31 @@ export default {
           <p class="text-sm text-slate-600 mt-2 line-clamp-3">{{ movie.overview }}</p>
           <div class="flex items-center justify-between mt-4">
             <span class="text-sm text-slate-700">⭐ {{ movie.vote_average.toFixed(1) }} ({{ movie.vote_count.toLocaleString() }})</span>
-            <button class="flex items-center gap-2 px-2 py-1 text-blue-600 font-medium cursor-pointer rounded hover:text-blue-800 transition-colors"
-                    title="Add to watchlist">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-7 7 7V5H5z"/>
+            <!-- Watchlist Button -->
+            <button
+                :title="isInWatchList(movie.id) ? 'Already in watchlist' : 'Add to watchlist'"
+                class="flex items-center gap-2 px-2 py-1 font-medium rounded transition-colors"
+                :class="isInWatchList(movie.id)
+    ? 'text-blue-600 cursor-pointer'
+    : 'text-blue-600 hover:text-blue-800 cursor-pointer'"
+                @click="toggleWatchList(movie.id)"
+            >
+              <svg v-if="!isInWatchList(movie.id)"
+                   xmlns="http://www.w3.org/2000/svg"
+                   class="h-5 w-5"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor"
+                   stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M5 5v14l7-7 7 7V5H5z"/>
+              </svg>
+              <svg v-else
+                   xmlns="http://www.w3.org/2000/svg"
+                   class="h-5 w-5"
+                   viewBox="0 0 24 24"
+                   fill="currentColor">
+                <path d="M5 3a2 2 0 0 0-2 2v16l9-6 9 6V5a2 2 0 0 0-2-2H5z"/>
               </svg>
             </button>
           </div>

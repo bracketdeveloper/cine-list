@@ -164,7 +164,6 @@ export async function getMoviesOrTvShow(link) {
             }
         });
 
-
         if (response.status === 200) {
             return response.data.results;
         } else {
@@ -200,5 +199,123 @@ export async function getGenre(link) {
         return [];
     }
 }
+
+export async function getMoviesOrTvShowById(imdbId) {
+    imdbId = String(imdbId);
+    const link = `https://api.themoviedb.org/3/movie/${imdbId}`;
+    try {
+        const response = await axios.get(link, {
+            params: {
+                external_source: "imdb_id",
+                language: "en-US"
+            },
+            headers: {
+                accept: "application/json",
+                Authorization: process.env.VUE_APP_TMDB_ACCESS_TOKEN
+            }
+        });
+
+
+        if (response.status === 200) {
+            return response.data; // only movie results
+        } else {
+            return null;
+        }
+
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function getWatchListByUserId(userId) {
+    let watchList = null
+
+    try {
+        const res = await axios.get(
+            `${process.env.VUE_APP_API_BASE_URL}/watch_lists`,
+            {
+                params: {
+                    user_id: userId
+                }
+            }
+        )
+        watchList = res.data[0]
+    } catch (err) {
+        if (err.response && err.response.status === 404) {
+            const createRes = await axios.post(
+                `${process.env.VUE_APP_API_BASE_URL}/watch_lists`,
+                {
+                    user_id: userId,
+                    movie_id: []
+                }
+            )
+
+            watchList = createRes.data
+        } else {
+            throw err
+        }
+    }
+    return watchList;
+}
+
+export async function addWatchListByUserId(userId, movieId) {
+    const getRes = await axios.get(
+
+        `${process.env.VUE_APP_API_BASE_URL}/watch_lists`,
+        {
+            params: { user_id: String(userId) }
+        }
+    )
+
+    const watchList = getRes.data[0]
+    const movies = watchList.movie_id || []
+    if (movies.includes(movieId)) {
+        return
+    }
+    const updatedMovies = [...movies, movieId]
+
+
+    await axios.put(
+        `${process.env.VUE_APP_API_BASE_URL}/watch_lists/${watchList.id}`,
+        {
+            user_id: watchList.user_id,
+            movie_id: updatedMovies,
+            createdAt: watchList.createdAt
+        }
+    )
+}
+// Vue method
+export async function  removeFromWatchList(movieId) {
+    alert('Removing movie from watchlist!');
+    await removeWatchListByUserId(this.userId, movieId);
+    this.watchList = await getWatchListByUserId(this.userId);
+    this.watchListMovies = this.watchList.movie_id || [];
+}
+
+// API helper
+export async function removeWatchListByUserId(userId, movieId) {
+    const getRes = await axios.get(
+        `${process.env.VUE_APP_API_BASE_URL}/watch_lists`,
+        { params: { user_id: String(userId) } }
+    );
+
+    const watchList = getRes.data[0];
+    const movies = watchList.movie_id || [];
+
+    // Remove movieId if it exists
+    const updatedMovies = movies.filter(id => id !== movieId);
+
+    await axios.put(
+        `${process.env.VUE_APP_API_BASE_URL}/watch_lists/${watchList.id}`,
+        {
+            user_id: watchList.user_id,
+            movie_id: updatedMovies,
+            createdAt: watchList.createdAt
+        }
+    );
+}
+
 
 
